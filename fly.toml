@@ -1,0 +1,20 @@
+# fly.toml app configuration file generated for fullstackopen-vinicius-persons on 2023-09-18T22:56:07-03:00
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = "fullstackopen-vinicius-persons"
+primary_region = "gru"
+
+[build]
+
+[env]
+  PORT = "3001"
+
+[http_service]
+  internal_port = 3001
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
