@@ -1,46 +1,48 @@
-require("dotenv").config();
-const express = require("express");
-const morgan = require("morgan");
-const cors = require("cors");
+require('dotenv').config();
+const express = require('express');
+const morgan = require('morgan');
+const cors = require('cors');
 
-const PersonService = require("./services/person");
+const PersonService = require('./services/person');
 
 const app = express();
 const PORT = process.env.PORT;
 
-morgan.token("body", (req) => {
+morgan.token('body', (req) => {
   return JSON.stringify(req.body);
 });
 
 app.use(express.json());
 app.use(
-  morgan(":method :url :status :res[content-length] - :response-time ms :body")
+  morgan(':method :url :status :res[content-length] - :response-time ms :body')
 );
 app.use(cors());
-app.use(express.static("dist"));
+app.use(express.static('dist'));
 
 const errorHandler = (error, _req, res, next) => {
   console.error(error);
   console.error(error.message);
 
-  if (error.name === "CastError") {
-    return res.status(400).send({ error: "malformatted id" });
+  if (error.name === 'CastError') {
+    return res.status(400).send({ error: 'malformatted id' });
+  } else if (error.name === 'ValidationError') {
+    return res.status(400).json({ error: error.message });
   }
 
   next(error);
 };
 
 const unknownEndpoint = (_req, res) => {
-  res.status(404).json({ error: "unknown endpoint" });
+  res.status(404).json({ error: 'unknown endpoint' });
 };
 
-app.get("/api/persons", (_req, res, next) => {
+app.get('/api/persons', (_req, res, next) => {
   PersonService.getAll()
     .then((persons) => res.json(persons))
     .catch((error) => next(error));
 });
 
-app.get("/info", (_req, res, next) => {
+app.get('/info', (_req, res, next) => {
   PersonService.getAll()
     .then((persons) => {
       res.send(
@@ -52,7 +54,7 @@ app.get("/info", (_req, res, next) => {
     .catch((error) => next(error));
 });
 
-app.get("/api/persons/:id", (req, res, next) => {
+app.get('/api/persons/:id', (req, res, next) => {
   const { id } = req.params;
 
   PersonService.getById(id)
@@ -63,7 +65,7 @@ app.get("/api/persons/:id", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-app.delete("/api/persons/:id", (req, res, next) => {
+app.delete('/api/persons/:id', (req, res, next) => {
   const { id } = req.params;
 
   PersonService.deleteById(id)
@@ -71,18 +73,13 @@ app.delete("/api/persons/:id", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-app.post("/api/persons", (req, res, next) => {
+app.post('/api/persons', (req, res, next) => {
   const person = req.body;
-
-  if (!person || !person.name || !person.number) {
-    res.status(400).json({ error: "missing person info" });
-    return;
-  }
 
   PersonService.getByName(person.name)
     .then((existingPersons) => {
       if (existingPersons.length) {
-        res.status(400).json({ error: "name must be unique" });
+        res.status(400).json({ error: 'name must be unique' });
         return;
       }
 
@@ -95,18 +92,13 @@ app.post("/api/persons", (req, res, next) => {
     .catch((error) => next(error));
 });
 
-app.put("/api/persons/:id", (req, res, next) => {
+app.put('/api/persons/:id', (req, res, next) => {
   const person = req.body;
-
-  if (!person || (!person.name && !person.number)) {
-    res.status(400).json({ error: "missing person info" });
-    return;
-  }
 
   PersonService.updateById(req.params.id, person)
     .then((updatedPerson) => {
       if (!updatedPerson) {
-        return res.status(404).json({ message: "person not found" });
+        return res.status(404).json({ error: 'person not found' });
       }
       res.status(200).json(updatedPerson);
     })

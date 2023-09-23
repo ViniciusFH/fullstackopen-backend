@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 if (process.argv.length < 3) {
-  console.log("give password as argument");
+  console.log('give password as argument');
   process.exit(1);
 }
 
@@ -9,7 +9,7 @@ const mongoPassword = process.argv[2];
 
 const url = `mongodb+srv://viniciusheleno:${mongoPassword}@fullstackopen.pirzsls.mongodb.net/phonebookApp?retryWrites=true&w=majority`;
 
-mongoose.set("strictQuery", false);
+mongoose.set('strictQuery', false);
 mongoose.connect(url);
 
 const personSchema = new mongoose.Schema({
@@ -17,7 +17,7 @@ const personSchema = new mongoose.Schema({
   number: String,
 });
 
-const Person = mongoose.model("Person", personSchema);
+const Person = mongoose.model('Person', personSchema);
 
 const entryName = process.argv[3];
 const entryNumber = process.argv[4];

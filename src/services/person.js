@@ -1,4 +1,4 @@
-const Person = require("../models/person");
+const Person = require('../models/person');
 
 function getAll() {
   return Person.find({});
@@ -25,7 +25,11 @@ async function createNew(person) {
 }
 
 async function updateById(id, data) {
-  const updatedPerson = await Person.findByIdAndUpdate(id, data, { new: true });
+  const updatedPerson = await Person.findByIdAndUpdate(id, data, {
+    new: true,
+    runValidators: true,
+    context: 'query',
+  });
 
   return updatedPerson;
 }
